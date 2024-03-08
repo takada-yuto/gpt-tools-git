@@ -1,14 +1,19 @@
-# Welcome to your CDK TypeScript project
+# 使い方
+## 事前準備
+### アクセストークン発行
+1. 使いたいGitプロジェクトグループのページに移動
+2. 設定のアクセストークンに移動
+3. 新しいトークンを追加
+4. トークン名適当に入力
+5. 有効期限適当に入力
+6. ロールの「Owner」を選択
+7. スコープの「api」にチェック
+8. グループアクセストークンを作成
+9. アクセストークンをコピーしてどこかに保存
 
-This is a blank project for CDK development with TypeScript.
+## アプリの使い方
+1. [アプリ](https://d3ndqk6pgcne5q.cloudfront.net/)にアクセス
+2. 発行したトークンを入力して保存
+3. プロンプト入力（左上のTemplateにプロンプトの例を載せてます）
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
-
-## Useful commands
-
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `cdk deploy`      deploy this stack to your default AWS account/region
-* `cdk diff`        compare deployed stack with current state
-* `cdk synth`       emits the synthesized CloudFormation template
+※ 機能はTemplateにあるものだけです。随時追加していきます。
