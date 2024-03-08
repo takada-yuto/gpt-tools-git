@@ -12,6 +12,7 @@ import { OpenAIClientOptions } from '@azure/openai/types/src'
 import { tokenState } from '../../atoms/tokenState'
 import { useRecoilState } from 'recoil'
 import { Link } from 'react-router-dom'
+import ReactMarkdown from 'react-markdown';
 
 const clientOptions: OpenAIClientOptions = { apiVersion: "2023-12-01-preview" }
 
@@ -26,7 +27,7 @@ const options: GetChatCompletionsOptions = {
   tools: TOOLS
 }
 
-export const Home = () => {
+export const Test = () => {
   const [input, setInput] = useState('')
   const [inputToken, setInputToken] = useState('')
   const [chatList, setChatList] = useState<ChatRequestMessage[] | []>([])
@@ -125,71 +126,70 @@ export const Home = () => {
 
   return (
     <>
-      <div className="container mx-auto mt-8">
-      <Link to={"/template"} className="mb-4 inline-block">
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-          Template
-        </button>
-      </Link>
-      <Link to={"/test"} className="mb-4 ml-2 inline-block">
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-          Test
-        </button>
-      </Link>
-      </div>
-      <form 
-        className='m-3 flex flex-row gap-1 '
-        onSubmit={(e) => onSubmitToken(e)}
-      >
-        <input
-          type='text'
-          value={inputToken}
-          className='grow bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-2.5'
-          onChange={(e) => setInputToken(e.target.value)}
-        />
-        <button 
-          type='submit'
-          className='text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg p-2.5'
-        >トークン保存</button>
-      </form>
-      <div className='m-3 gap-1 flex flex-col'>
-        {chatList.map((chat, index) => {
-          let content = ''
-          let addClass = ''
-          content = String(chat.content)
-          if (!chat.content) return ''
-          if (chat.role === 'function') return ''
-          if (chat.role === 'user') addClass += ' ml-auto mr-0'
-          return (
-            <p
-              key={index}
-              className={
-                'whitespace-pre-wrap break-all border border-gray-300 text-gray-900 rounded-lg p-2.5 w-fit' +
-                addClass
-              }
-            >
-              {content}
-            </p>
-          )
-        })}
-      </div>
-      <form
-        onSubmit={(e) => onSubmitHandler(e)}
-        className='m-3 flex flex-row gap-1 '
-      >
-        <input
-          type='text'
-          value={input}
-          className='grow bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-2.5'
-          onChange={(e) => setInput(e.target.value)}
-        />
-        <button
-          type='submit'
-          className='text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg p-2.5'
+      <div className="bg-slate-100">
+        <div className="container mx-4">
+          <Link to={"/"} className="mb-4 inline-block">
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+              Home
+            </button>
+          </Link>
+        </div>
+        <form 
+          className='m-3 flex flex-row gap-1 '
+          onSubmit={(e) => onSubmitToken(e)}
         >
-          送信
-        </button>
-      </form>
+          <input
+            type='text'
+            value={inputToken}
+            className='grow bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-2.5'
+            onChange={(e) => setInputToken(e.target.value)}
+          />
+          <button 
+            type='submit'
+            className='text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg p-2.5'
+          >トークン保存</button>
+        </form>
+        <div className='m-3 gap-1 flex flex-col'>
+          {chatList.map((chat, index) => {
+            let content = ''
+            let addClass = ''
+            content = String(chat.content)
+            if (!chat.content) return ''
+            if (chat.role === 'function') return ''
+            if (chat.role === 'user') addClass += ' ml-auto mr-0'
+            return (
+              <ReactMarkdown
+                key={index}
+                className={
+                  'whitespace-pre-wrap break-all border bg-gray-50 border-gray-300 text-gray-900 rounded-lg p-2.5 w-fit' +
+                  addClass
+                }
+                components={{
+                  a: ({ node, ...props }) => <a {...props} className="text-blue-500 underline" />
+                }}
+                children={content}
+              />
+            )
+          })}
+        </div>
+        <form
+          onSubmit={(e) => onSubmitHandler(e)}
+          className='m-3 flex flex-row gap-1 '
+        >
+          <textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            className='grow bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-2.5'
+            rows={6} // 適切な行数を設定してください
+          />
+          <button
+            type='submit'
+            className='text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg p-2.5'
+          >
+            送信
+          </button>
+        </form>
+      </div>
     </>
   )
 }

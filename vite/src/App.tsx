@@ -3,6 +3,7 @@ import './App.css'
 import { Home } from './components/Home'
 import { RecoilRoot } from 'recoil'
 import { Template } from './components/Template'
+import { Test } from './components/Test'
 
 
 const router = createBrowserRouter([
@@ -13,6 +14,10 @@ const router = createBrowserRouter([
   {
     path: '/template',
     element: <Template />,
+  },
+  {
+    path: '/test',
+    element: <Test />,
   },
 ])
 
