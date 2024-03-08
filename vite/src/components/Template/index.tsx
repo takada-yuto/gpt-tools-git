@@ -9,6 +9,8 @@ export const Template = () => {
     'ブランチ一覧: 「poker」のリポジトリのブランチ一覧を見せて',
     'ブランチ作成: 「poker」のリポジトリのnew_branchブランチから「new_test_branch」というブランチを作成してください。',
     'ブランチ削除: 「poker」のリポジトリの「new_test_branch」というブランチを削除してください。',
+    'ファイル作成: 「poker」のリポジトリの「test」というブランチにconsole.tsを作成してください。中身は「console.log("Hello")」です。ファイルのパスはconsole.tsです。コミットメッセージ名は「Hello表示ファイル」です。',
+    'ファイル削除: 「poker」のリポジトリの「test」というブランチのindex.tsを削除してください。ファイルのパスはindex.tsです。コミットメッセージ名は「index.ts削除」です。',
   ];
   return (
     <div className="container mx-auto mt-8">

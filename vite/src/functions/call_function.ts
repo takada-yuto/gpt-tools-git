@@ -4,6 +4,7 @@ import { searchProjectId } from "./project"
 import { listCommits, revertCommit } from "./commit"
 import { createBranches, deleteBranches, listBranches } from "./branch";
 import { searchGroupId } from "./group";
+import { createFile, deleteFile } from "./file";
 
 const functionMap: { [key: string]: (token: string, args: any) => Promise<any> } = {
   'getMergeRequests': getMergeRequests,
@@ -15,6 +16,8 @@ const functionMap: { [key: string]: (token: string, args: any) => Promise<any> }
   'createBranches': createBranches,
   'deleteBranches': deleteBranches,
   'searchGroupId': searchGroupId,
+  'createFile': createFile,
+  'deleteFile': deleteFile,
 };
 
 export const callFunction = async (token: string,functionCall: FunctionCall) => {

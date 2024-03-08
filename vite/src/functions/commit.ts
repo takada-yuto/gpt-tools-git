@@ -3,7 +3,7 @@ import { searchProjectId } from "./project";
 const page = import.meta.env.VITE_DISPLAY_PAGE
 const per_page = import.meta.env.VITE_DISPLAY_PER_PAGE
 export const listCommits = async(token: string, _args: any) => {
-  console.log("search_commit_idが呼ばれました");
+  console.log("listCommitsが呼ばれました");
   const projectId = await searchProjectId(token, _args)
   const args = JSON.parse(_args)
   const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/commits?private_token=${token}&page=${page}&per_page=${per_page}&ref_name=${args.branch}`;
@@ -13,7 +13,7 @@ export const listCommits = async(token: string, _args: any) => {
   };
   const response = await fetch(url, { headers: headers })
   const responseData = await response.json();
-  return JSON.stringify({ "search_commit_id": responseData })
+  return JSON.stringify({ "list_commits": responseData })
 }
 
 export const searchCommitId = async (token: string, _args: any) => {

@@ -188,5 +188,69 @@ export const TOOLS: ChatCompletionsFunctionToolDefinition[] = [
           required: ["group_name"],
         },
       },
+  },
+  {
+    type: 'function',
+    function: 
+      {
+        name: 'createFile',
+        description: '指定されたGitプロジェクトに、指定された内容でファイルを作成する',
+        parameters: {
+          type: 'object',
+          properties: {
+            project_name: {
+              type: 'string',
+              description: 'Gitプロジェクトの名前 (例:chat app、AI-Brid、saikontan-bot、image-post-app)',
+            },
+            content: {
+              type: 'string',
+              description: 'ファイルの内容',
+            },
+            file_path: {
+              type: 'string',
+              description: '作成するファイルのパス (例:app/index.html、app/hooks/useGetInfo、.env、package.json)',
+            },
+            branch: {
+              type: 'string',
+              description: 'ブランチの名前 (例:master、develop、feature/12345、feature/test)',
+            },
+            commit_message: {
+              type: 'string',
+              description: 'コミットメッセージ名 (例:Update .env.sample、first commit、setup構文に変更、リファクタリング)',
+            }
+          },
+          required: ["project_name", "file_path", "branch", "commit_message"],
+        },
+      },
+  },
+  {
+    type: 'function',
+    function: 
+      {
+        name: 'deleteFile',
+        description: '指定されたGitプロジェクトの指定されたファイルを削除する',
+        parameters: {
+          type: 'object',
+          properties: {
+            project_name: {
+              type: 'string',
+              description: 'Gitプロジェクトの名前 (例:chat app、AI-Brid、saikontan-bot、image-post-app)',
+            },
+            file_path: {
+              type: 'string',
+              description: '削除するファイルのパス (例:app/index.html、app/hooks/useGetInfo、.env、package.json)',
+            },
+            branch: {
+              type: 'string',
+              description: 'ブランチの名前 (例:master、develop、feature/12345、feature/test)',
+            },
+            commit_message: {
+              type: 'string',
+              description: 'コミットメッセージ名 (例:Update .env.sample、first commit、setup構文に変更、リファクタリング)',
+            }
+          },
+          required: ["project_name", "file_path", "branch", "commit_message"],
+        },
+      },
   }
 ]
