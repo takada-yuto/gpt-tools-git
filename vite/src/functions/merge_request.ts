@@ -1,10 +1,6 @@
-import { useRecoilValue } from "recoil"
 import { searchProjectId } from "./project"
-import { tokenState } from "../atoms/tokenState"
 
 export const getMergeRequests = async (token: string, _args: any) => {
-  console.log("token")
-  console.log(token)
   const page = import.meta.env.VITE_DISPLAY_PAGE
   const per_page = import.meta.env.VITE_DISPLAY_PER_PAGE
   const projectId = await searchProjectId(token, _args)

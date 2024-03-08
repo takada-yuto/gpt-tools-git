@@ -1,21 +1,17 @@
 import { searchProjectId } from "./project";
 
-const token = import.meta.env.VITE_PERSONAL_GROUP_TOKEN
 const page = import.meta.env.VITE_DISPLAY_PAGE
 const per_page = import.meta.env.VITE_DISPLAY_PER_PAGE
-export const listCommits = async(_args: any) => {
+export const listCommits = async(token: string, _args: any) => {
   console.log("search_commit_idが呼ばれました");
   const projectId = await searchProjectId(token, _args)
-  const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/commits?private_token=${token}&page=${page}&per_page=${per_page}`;
+  const args = JSON.parse(_args)
+  const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/commits?private_token=${token}&page=${page}&per_page=${per_page}&ref_name=${args.branch}`;
   const headers = {
     "PRIVATE-TOKEN": token,
     "Content-Type": "application/json"
   };
-  const args = JSON.parse(_args)
-  const data = {  
-    "ref_name": args.branch,
-  }
-  const response = await fetch(url, { headers: headers, body: JSON.stringify(data) })
+  const response = await fetch(url, { headers: headers })
   const responseData = await response.json();
   return JSON.stringify({ "search_commit_id": responseData })
 }
@@ -50,9 +46,7 @@ export const revertCommit = async (token: string, _args: any) => {
   } else {
     const commitId = await searchCommitId(token, _args);
     lastSha = commitId;
-    console.log(`id: ${commitId}`);
   }
-  console.log(`sha: ${args.sha}`);
   const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/commits/${lastSha}/revert`;
   const headers = {
     'PRIVATE-TOKEN': token,

@@ -6,11 +6,12 @@ import {
   FunctionCall,
   GetChatCompletionsOptions,
 } from '@azure/openai'
-import { callFunction } from '../functions/call_function'
-import { TOOLS } from '../lib/tools'
+import { callFunction } from '../../functions/call_function'
+import { TOOLS } from '../../lib/tools'
 import { OpenAIClientOptions } from '@azure/openai/types/src'
-import { tokenState } from '../atoms/tokenState'
-import { useRecoilState, useSetRecoilState } from 'recoil'
+import { tokenState } from '../../atoms/tokenState'
+import { useRecoilState } from 'recoil'
+import { Link } from 'react-router-dom'
 
 const clientOptions: OpenAIClientOptions = { apiVersion: "2023-12-01-preview" }
 
@@ -122,18 +123,15 @@ export const Home = () => {
     setInputToken('')
   };
 
-  useEffect(() => {
-    console.log(token)
-  }, [onSubmitToken])
-
   return (
     <>
-      {/* <input
-          type='text'
-          value={input}
-          className='grow bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-2.5'
-          onChange={(e) => setToken(e.target.value)}
-        /> */}
+      <div className="container mx-auto mt-8">
+      <Link to={"/template"} className="mb-4 inline-block">
+        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          Template
+        </button>
+      </Link>
+      </div>
       <form 
         className='m-3 flex flex-row gap-1 '
         onSubmit={(e) => onSubmitToken(e)}

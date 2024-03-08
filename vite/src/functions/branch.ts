@@ -1,10 +1,9 @@
 import { searchProjectId } from "./project";
 
-const token = import.meta.env.VITE_PERSONAL_GROUP_TOKEN
 const page = import.meta.env.VITE_DISPLAY_PAGE
 const per_page = import.meta.env.VITE_DISPLAY_PER_PAGE
 
-export const listBranches = async(_args: any) => {
+export const listBranches = async(token: string, _args: any) => {
   console.log("list_branchesが呼ばれました");
   const projectId = await searchProjectId(token, _args)
   const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/branches?page=${page}&per_page=${per_page}`;
@@ -17,7 +16,7 @@ export const listBranches = async(_args: any) => {
   return JSON.stringify({ "search_commit_id": responseData })
 }
 
-export const createBranches = async(_args: any) => {
+export const createBranches = async(token: string, _args: any) => {
   console.log("create_branchesが呼ばれました");
   const projectId = await searchProjectId(token, _args)
   const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/branches`;
@@ -30,15 +29,12 @@ export const createBranches = async(_args: any) => {
     "branch": args.new_branch,
     "ref": args.source_bransh,
   }
-  console.log(data)
   const response = await fetch(url, { method: 'POST', headers: headers, body: JSON.stringify(data) })
-  console.log(response)
-  console.log(response.text)
   const responseData = await response.json();
   return JSON.stringify({ "new_branch": responseData })
 }
 
-export const deleteBranches = async(_args: any) => {
+export const deleteBranches = async(token: string, _args: any) => {
   console.log("delete_branchesが呼ばれました");
   const projectId = await searchProjectId(token, _args)
   const args = JSON.parse(_args)
