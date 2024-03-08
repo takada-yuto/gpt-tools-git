@@ -1,4 +1,4 @@
-import { FormEvent, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import {
   OpenAIClient,
   AzureKeyCredential,
@@ -9,6 +9,8 @@ import {
 import { callFunction } from '../functions/call_function'
 import { TOOLS } from '../lib/tools'
 import { OpenAIClientOptions } from '@azure/openai/types/src'
+import { tokenState } from '../atoms/tokenState'
+import { useRecoilState, useSetRecoilState } from 'recoil'
 
 const clientOptions: OpenAIClientOptions = { apiVersion: "2023-12-01-preview" }
 
@@ -25,7 +27,10 @@ const options: GetChatCompletionsOptions = {
 
 export const Home = () => {
   const [input, setInput] = useState('')
+  const [inputToken, setInputToken] = useState('')
   const [chatList, setChatList] = useState<ChatRequestMessage[] | []>([])
+  const [token, setToken] = useRecoilState(tokenState)
+
   const onSubmitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const newMessages: ChatRequestMessage[] = [
@@ -63,7 +68,7 @@ export const Home = () => {
             
             if (available_functions.includes(function_name)) {
               const args: FunctionCall = tool_call.function
-              const function_response = await callFunction(args)
+              const function_response = await callFunction(token, args)
               tool_response_messages.push({
                 "tool_call_id": tool_call.id,
                 "role": "tool",
@@ -111,8 +116,39 @@ export const Home = () => {
     }
   }
 
+  const onSubmitToken = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setToken(inputToken);
+    setInputToken('')
+  };
+
+  useEffect(() => {
+    console.log(token)
+  }, [onSubmitToken])
+
   return (
     <>
+      {/* <input
+          type='text'
+          value={input}
+          className='grow bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-2.5'
+          onChange={(e) => setToken(e.target.value)}
+        /> */}
+      <form 
+        className='m-3 flex flex-row gap-1 '
+        onSubmit={(e) => onSubmitToken(e)}
+      >
+        <input
+          type='text'
+          value={inputToken}
+          className='grow bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-2.5'
+          onChange={(e) => setInputToken(e.target.value)}
+        />
+        <button 
+          type='submit'
+          className='text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg p-2.5'
+        >Save Token</button>
+      </form>
       <div className='m-3 gap-1 flex flex-col'>
         {chatList.map((chat, index) => {
           let content = ''

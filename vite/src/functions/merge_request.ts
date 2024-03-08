@@ -1,10 +1,13 @@
+import { useRecoilValue } from "recoil"
 import { searchProjectId } from "./project"
+import { tokenState } from "../atoms/tokenState"
 
-export const getMergeRequests = async (_args: any) => {
-  const token = import.meta.env.VITE_PERSONAL_GROUP_TOKEN
+export const getMergeRequests = async (token: string, _args: any) => {
+  console.log("token")
+  console.log(token)
   const page = import.meta.env.VITE_DISPLAY_PAGE
   const per_page = import.meta.env.VITE_DISPLAY_PER_PAGE
-  const projectId = await searchProjectId(_args)
+  const projectId = await searchProjectId(token, _args)
   const url = `${import.meta.env.VITE_GITLAB_URL}/projects/${projectId}/merge_requests?private_token=${token}&page=${page}&per_page=${per_page}`
   const headers = {
     "PRIVATE-TOKEN": token,
@@ -15,11 +18,10 @@ export const getMergeRequests = async (_args: any) => {
   return JSON.stringify({ "merge_request_info": responseData })
 }
 
-export const createMergeRequests = async (_args: any) => {
-  const token = import.meta.env.VITE_PERSONAL_GROUP_TOKEN
+export const createMergeRequests = async (token: string, _args: any) => {
   const page = import.meta.env.VITE_DISPLAY_PAGE
   const per_page = import.meta.env.VITE_DISPLAY_PER_PAGE
-  const projectId = await searchProjectId(_args)
+  const projectId = await searchProjectId(token, _args)
   const url = `${import.meta.env.VITE_GITLAB_URL}/projects/${projectId}/merge_requests?private_token=${token}&page=${page}&per_page=${per_page}`
   const headers = {
     "PRIVATE-TOKEN": token,

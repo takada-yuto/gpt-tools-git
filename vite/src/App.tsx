@@ -1,6 +1,7 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import './App.css'
 import { Home } from './components/Home'
+import { RecoilRoot } from 'recoil'
 
 
 const router = createBrowserRouter([
@@ -13,7 +14,9 @@ const router = createBrowserRouter([
 export const App = () => {
   return (
     <>
-      <RouterProvider router={router} />
+      <RecoilRoot>
+        <RouterProvider router={router} />
+      </RecoilRoot>
     </>
   )
 }

@@ -170,5 +170,23 @@ export const TOOLS: ChatCompletionsFunctionToolDefinition[] = [
           required: ["project_name", "delete_branch"],
         },
       },
+  },
+  {
+    type: 'function',
+    function: 
+      {
+        name: 'searchGroupId',
+        description: '指定されたGitグループののグループidを取得する',
+        parameters: {
+          type: 'object',
+          properties: {
+            group_name: {
+              type: 'string',
+              description: 'Gitグループの名前 (例:NBI オフラベル、AIシステム部、prototype)',
+            },
+          },
+          required: ["group_name"],
+        },
+      },
   }
 ]

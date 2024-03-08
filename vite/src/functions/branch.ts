@@ -6,7 +6,7 @@ const per_page = import.meta.env.VITE_DISPLAY_PER_PAGE
 
 export const listBranches = async(_args: any) => {
   console.log("list_branchesが呼ばれました");
-  const projectId = await searchProjectId(_args)
+  const projectId = await searchProjectId(token, _args)
   const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/branches?page=${page}&per_page=${per_page}`;
   const headers = {
     "PRIVATE-TOKEN": token,
@@ -19,7 +19,7 @@ export const listBranches = async(_args: any) => {
 
 export const createBranches = async(_args: any) => {
   console.log("create_branchesが呼ばれました");
-  const projectId = await searchProjectId(_args)
+  const projectId = await searchProjectId(token, _args)
   const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/branches`;
   const headers = {
     "PRIVATE-TOKEN": token,
@@ -40,7 +40,7 @@ export const createBranches = async(_args: any) => {
 
 export const deleteBranches = async(_args: any) => {
   console.log("delete_branchesが呼ばれました");
-  const projectId = await searchProjectId(_args)
+  const projectId = await searchProjectId(token, _args)
   const args = JSON.parse(_args)
   const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/branches/${args.delete_branch}`;
   const headers = {
