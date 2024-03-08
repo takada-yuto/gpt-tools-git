@@ -8,12 +8,16 @@ import {
 } from '@azure/openai'
 import { callFunction } from '../functions/call_function'
 import { TOOLS } from '../lib/tools'
+import { OpenAIClientOptions } from '@azure/openai/types/src'
+
+const clientOptions: OpenAIClientOptions = { apiVersion: "2023-12-01-preview" }
 
 const client = new OpenAIClient(
   import.meta.env.VITE_AZURE_URL,
-  new AzureKeyCredential(import.meta.env.VITE_AZURE_API_KEY)
+  new AzureKeyCredential(import.meta.env.VITE_AZURE_API_KEY),
+  clientOptions
 )
-const deploymentId = 'gpt-35-turbo-1106'
+const deploymentId = 'gpt-4-turbo'
 
 const options: GetChatCompletionsOptions = { 
   tools: TOOLS
@@ -39,7 +43,8 @@ export const Home = () => {
       messages,
       options,
     )
-    console.log(events)
+    console.log("client")
+    console.log(client)
     handleResponse(events)
 
     async function handleResponse(response: any) {
