@@ -2,13 +2,13 @@ import { Link } from 'react-router-dom'
 
 export const Template = () => {
   const promptTemplates = [
-    '「poker」というプロジェクトのマージリクエストを見せて',
-    '「poker」のリポジトリの「test」ブランチから「master」ブランチ向けにマージリクエストを作成してください。タイトルは「title_test」で、説明は「description_test」にしてください。',
-    '「poker」のリポジトリのtestブランチのコミット一覧を見たい',
-    '「poker」のリポジトリのtestブランチの「revert」というコミット名のコミットをリバートしてください。',
-    '「poker」のリポジトリのブランチ一覧を見せて',
-    '「poker」のリポジトリのnew_branchブランチから「new_test_branch」というブランチを作成してください。',
-    '「poker」のリポジトリの「new_test_branch」というブランチを削除してください。',
+    'MR一覧: 「poker」というプロジェクトのマージリクエストを見せて',
+    'MR作成: 「poker」のリポジトリの「test」ブランチから「master」ブランチ向けにマージリクエストを作成してください。タイトルは「title_test」で、説明は「description_test」にしてください。',
+    'コミット一覧: 「poker」のリポジトリのtestブランチのコミット一覧を見たい',
+    'リバート: 「poker」のリポジトリのtestブランチの「revert」というコミット名のコミットをリバートしてください。',
+    'ブランチ一覧: 「poker」のリポジトリのブランチ一覧を見せて',
+    'ブランチ作成: 「poker」のリポジトリのnew_branchブランチから「new_test_branch」というブランチを作成してください。',
+    'ブランチ削除: 「poker」のリポジトリの「new_test_branch」というブランチを削除してください。',
   ];
   return (
     <div className="container mx-auto mt-8">
