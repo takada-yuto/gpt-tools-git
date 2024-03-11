@@ -7,7 +7,12 @@ import { searchGroupId } from "./group"
 import { createFile, deleteFile, updateFile } from "./file"
 
 const functionMap: {
-  [key: string]: (token: string, args: any) => Promise<any>
+  [key: string]: (
+    token: string,
+    args: any,
+    page: number,
+    perPage: number
+  ) => Promise<any>
 } = {
   getMergeRequests: getMergeRequests,
   searchProjectId: searchProjectId,
@@ -25,13 +30,20 @@ const functionMap: {
 
 export const callFunction = async (
   token: string,
-  functionCall: FunctionCall
+  functionCall: FunctionCall,
+  page: number,
+  perPage: number
 ) => {
   const functionName = functionCall.name
   const functionArgs = functionCall.arguments
 
   if (functionName in functionMap) {
-    const result = await functionMap[functionName](token, functionArgs)
+    const result = await functionMap[functionName](
+      token,
+      functionArgs,
+      page,
+      perPage
+    )
     return result
   } else {
     throw new Error(`Unsupported function: ${functionName}`)

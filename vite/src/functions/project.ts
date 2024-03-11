@@ -17,7 +17,12 @@ const client = new OpenAIClient(
 )
 const deploymentId = "gpt-4-turbo"
 
-export const searchProjectId = async (token: string, _args: any) => {
+export const searchProjectId = async (
+  token: string,
+  _args: any,
+  page: number,
+  perPage: number
+) => {
   console.log("searchProjectIdが呼ばれました")
   console.log(_args)
   const args = JSON.parse(_args)

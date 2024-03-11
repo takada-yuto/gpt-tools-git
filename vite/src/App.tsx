@@ -7,6 +7,7 @@ import { Test } from "./components/Test"
 import { CreateFile } from "./components/CreateFile"
 import { UpdateFile } from "./components/UpdateFile"
 import { RevertCommit } from "./components/RevertCommit"
+import { Index } from "./components/Index"
 
 const router = createBrowserRouter([
   {
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
   {
     path: "/revertCommit",
     element: <RevertCommit />,
+  },
+  {
+    path: "/index",
+    element: <Index />,
   },
 ])
 

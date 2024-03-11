@@ -1,13 +1,16 @@
 import { Toast } from "../util/toast"
 import { searchProjectId } from "./project"
 
-const page = import.meta.env.VITE_DISPLAY_PAGE
-const per_page = import.meta.env.VITE_DISPLAY_PER_PAGE
-export const listCommits = async (token: string, _args: any) => {
+export const listCommits = async (
+  token: string,
+  _args: any,
+  page: number,
+  perPage: number
+) => {
   console.log("listCommitsが呼ばれました")
-  const projectId = await searchProjectId(token, _args)
+  const projectId = await searchProjectId(token, _args, page, perPage)
   const args = JSON.parse(_args)
-  const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/commits?private_token=${token}&page=${page}&per_page=${per_page}&ref_name=${args.branch}`
+  const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/commits?private_token=${token}&page=${page}&per_page=${perPage}&ref_name=${args.branch}`
   const headers = {
     "PRIVATE-TOKEN": token,
     "Content-Type": "application/json",
@@ -17,9 +20,14 @@ export const listCommits = async (token: string, _args: any) => {
   return JSON.stringify({ list_commits: responseData })
 }
 
-export const searchCommitId = async (token: string, _args: any) => {
+export const searchCommitId = async (
+  token: string,
+  _args: any,
+  page: number,
+  perPage: number
+) => {
   console.log("search_commit_idが呼ばれました")
-  const projectId = await searchProjectId(token, _args)
+  const projectId = await searchProjectId(token, _args, page, perPage)
   const args = JSON.parse(_args)
   const encodedCommitName = encodeURIComponent(args.commit_name)
   const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/search?scope=commits&search=${encodedCommitName}&ref=${args.branch}`
@@ -46,9 +54,14 @@ export const searchCommitId = async (token: string, _args: any) => {
   }
 }
 
-export const revertCommit = async (token: string, _args: any) => {
+export const revertCommit = async (
+  token: string,
+  _args: any,
+  page: number,
+  perPage: number
+) => {
   console.log("revert_commitが呼ばれました")
-  const projectId = await searchProjectId(token, _args)
+  const projectId = await searchProjectId(token, _args, page, perPage)
   const args = JSON.parse(_args)
   let lastSha: string
   if (args.sha) {

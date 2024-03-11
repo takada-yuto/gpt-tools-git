@@ -7,9 +7,14 @@ import {
   OpenAIClientOptions,
 } from "@azure/openai"
 
-export const createFile = async (token: string, _args: any) => {
+export const createFile = async (
+  token: string,
+  _args: any,
+  page: number,
+  perPage: number
+) => {
   console.log("createFileが呼ばれました")
-  const projectId = await searchProjectId(token, _args)
+  const projectId = await searchProjectId(token, _args, page, perPage)
   const args = JSON.parse(_args)
   const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/files/${args.file_path}`
   const headers = {
@@ -35,9 +40,14 @@ export const createFile = async (token: string, _args: any) => {
   return JSON.stringify({ new_file: responseData })
 }
 
-export const deleteFile = async (token: string, _args: any) => {
+export const deleteFile = async (
+  token: string,
+  _args: any,
+  page: number,
+  perPage: number
+) => {
   console.log("deleteFileが呼ばれました")
-  const projectId = await searchProjectId(token, _args)
+  const projectId = await searchProjectId(token, _args, page, perPage)
   const args = JSON.parse(_args)
   const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/files/${args.file_path}`
   const headers = {
@@ -57,7 +67,12 @@ export const deleteFile = async (token: string, _args: any) => {
   return JSON.stringify({ delete_file: responseData })
 }
 
-export const updateFile = async (token: string, _args: any) => {
+export const updateFile = async (
+  token: string,
+  _args: any,
+  page: number,
+  perPage: number
+) => {
   console.log("updateFileが呼ばれました")
   const clientOptions: OpenAIClientOptions = {
     apiVersion: "2023-12-01-preview",
@@ -92,7 +107,7 @@ export const updateFile = async (token: string, _args: any) => {
       },
     ],
   }
-  const projectId = await searchProjectId(token, _args)
+  const projectId = await searchProjectId(token, _args, page, perPage)
   const args = JSON.parse(_args)
   const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/files/${args.file_path}/raw?ref=${args.branch}`
   const headers = {

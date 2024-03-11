@@ -1,12 +1,14 @@
 import { searchProjectId } from "./project"
 
-const page = import.meta.env.VITE_DISPLAY_PAGE
-const per_page = import.meta.env.VITE_DISPLAY_PER_PAGE
-
-export const listBranches = async (token: string, _args: any) => {
+export const listBranches = async (
+  token: string,
+  _args: any,
+  page: number,
+  perPage: number
+) => {
   console.log("list_branchesが呼ばれました")
-  const projectId = await searchProjectId(token, _args)
-  const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/branches?page=${page}&per_page=${per_page}`
+  const projectId = await searchProjectId(token, _args, page, perPage)
+  const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/branches?page=${page}&per_page=${perPage}`
   const headers = {
     "PRIVATE-TOKEN": token,
     "Content-Type": "application/json",
@@ -16,9 +18,14 @@ export const listBranches = async (token: string, _args: any) => {
   return JSON.stringify({ search_commit_id: responseData })
 }
 
-export const createBranches = async (token: string, _args: any) => {
+export const createBranches = async (
+  token: string,
+  _args: any,
+  page: number,
+  perPage: number
+) => {
   console.log("create_branchesが呼ばれました")
-  const projectId = await searchProjectId(token, _args)
+  const projectId = await searchProjectId(token, _args, page, perPage)
   const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/branches`
   const headers = {
     "PRIVATE-TOKEN": token,
@@ -38,9 +45,14 @@ export const createBranches = async (token: string, _args: any) => {
   return JSON.stringify({ new_branch: responseData })
 }
 
-export const deleteBranches = async (token: string, _args: any) => {
+export const deleteBranches = async (
+  token: string,
+  _args: any,
+  page: number,
+  perPage: number
+) => {
   console.log("delete_branchesが呼ばれました")
-  const projectId = await searchProjectId(token, _args)
+  const projectId = await searchProjectId(token, _args, page, perPage)
   const args = JSON.parse(_args)
   const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/branches/${args.delete_branch}`
   const headers = {

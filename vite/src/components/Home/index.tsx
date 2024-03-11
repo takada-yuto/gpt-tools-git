@@ -32,6 +32,8 @@ export const Home = () => {
   const [inputToken, setInputToken] = useState("")
   const [chatList, setChatList] = useState<ChatRequestMessage[] | []>([])
   const [token, setToken] = useRecoilState(tokenState)
+  const [page, setPage] = useState(1)
+  const [perPage, setPerPage] = useState(3)
 
   const onSubmitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -69,7 +71,12 @@ export const Home = () => {
 
             if (available_functions.includes(function_name)) {
               const args: FunctionCall = tool_call.function
-              const function_response = await callFunction(token, args)
+              const function_response = await callFunction(
+                token,
+                args,
+                page,
+                perPage
+              )
               tool_response_messages.push({
                 tool_call_id: tool_call.id,
                 role: "tool",
@@ -125,7 +132,7 @@ export const Home = () => {
 
   return (
     <>
-      <div className="container mx-auto mt-8">
+      <div className="container">
         <Link to={"/template"} className="mb-4 inline-block">
           <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
             機能一覧
@@ -144,6 +151,11 @@ export const Home = () => {
         <Link to={"/revertCommit"} className="mb-4 ml-2 inline-block">
           <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
             リバート
+          </button>
+        </Link>
+        <Link to={"/index"} className="mb-4 ml-2 inline-block">
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            いろんな一覧表示
           </button>
         </Link>
       </div>

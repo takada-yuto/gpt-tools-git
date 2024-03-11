@@ -1,6 +1,11 @@
 import { Toast } from "../util/toast"
 
-export const searchGroupId = async (token: string, _args: any) => {
+export const searchGroupId = async (
+  token: string,
+  _args: any,
+  page: number,
+  perPage: number
+) => {
   console.log("searchGroupIdが呼ばれました")
   const args = JSON.parse(_args)
   const url = `https://gitlab-system-dev.k-idea.jp/api/v4/groups?search=${args.group_name}`

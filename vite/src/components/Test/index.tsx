@@ -32,6 +32,8 @@ export const Test = () => {
   const [inputToken, setInputToken] = useState("")
   const [chatList, setChatList] = useState<ChatRequestMessage[] | []>([])
   const [token, setToken] = useRecoilState(tokenState)
+  const [page, setPage] = useState(1)
+  const [perPage, setPerPage] = useState(3)
 
   const onSubmitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -69,7 +71,12 @@ export const Test = () => {
 
             if (available_functions.includes(function_name)) {
               const args: FunctionCall = tool_call.function
-              const function_response = await callFunction(token, args)
+              const function_response = await callFunction(
+                token,
+                args,
+                page,
+                perPage
+              )
               tool_response_messages.push({
                 tool_call_id: tool_call.id,
                 role: "tool",

@@ -1,12 +1,15 @@
 import { searchProjectId } from "./project"
 
-export const getMergeRequests = async (token: string, _args: any) => {
-  const page = import.meta.env.VITE_DISPLAY_PAGE
-  const per_page = import.meta.env.VITE_DISPLAY_PER_PAGE
-  const projectId = await searchProjectId(token, _args)
+export const getMergeRequests = async (
+  token: string,
+  _args: any,
+  page: number,
+  perPage: number
+) => {
+  const projectId = await searchProjectId(token, _args, page, perPage)
   const url = `${
     import.meta.env.VITE_GITLAB_URL
-  }/projects/${projectId}/merge_requests?private_token=${token}&page=${page}&per_page=${per_page}`
+  }/projects/${projectId}/merge_requests?private_token=${token}&page=${page}&per_page=${perPage}`
   const headers = {
     "PRIVATE-TOKEN": token,
     "Content-Type": "application/json",
@@ -16,13 +19,16 @@ export const getMergeRequests = async (token: string, _args: any) => {
   return JSON.stringify({ merge_request_info: responseData })
 }
 
-export const createMergeRequests = async (token: string, _args: any) => {
-  const page = import.meta.env.VITE_DISPLAY_PAGE
-  const per_page = import.meta.env.VITE_DISPLAY_PER_PAGE
-  const projectId = await searchProjectId(token, _args)
+export const createMergeRequests = async (
+  token: string,
+  _args: any,
+  page: number,
+  perPage: number
+) => {
+  const projectId = await searchProjectId(token, _args, page, perPage)
   const url = `${
     import.meta.env.VITE_GITLAB_URL
-  }/projects/${projectId}/merge_requests?private_token=${token}&page=${page}&per_page=${per_page}`
+  }/projects/${projectId}/merge_requests?private_token=${token}&page=${page}&per_page=${perPage}`
   const headers = {
     "PRIVATE-TOKEN": token,
     "Content-Type": "application/json",

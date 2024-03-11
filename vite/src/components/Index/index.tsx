@@ -25,32 +25,40 @@ const client = new OpenAIClient(
 const deploymentId = "gpt-35-turbo-1106"
 
 const options: GetChatCompletionsOptions = {
-  tools: [TOOLS[8]], // ファイル作成関数指定
+  tools: [TOOLS[3]], // ファイル作成関数指定
 }
 
-export const CreateFile = () => {
+export const Index = () => {
   const [input, setInput] = useState("")
   const [inputToken, setInputToken] = useState("")
   const [projectName, setProjectName] = useState("")
-  const [fileContent, setFileContent] = useState("")
-  const [filePath, setFilePath] = useState("")
   const [branch, setBranch] = useState("")
-  const [commitMessage, setCommitMessage] = useState("")
   const [chatList, setChatList] = useState<ChatRequestMessage[] | []>([])
   const [token, setToken] = useRecoilState(tokenState)
   const [page, setPage] = useState(1)
   const [perPage, setPerPage] = useState(3)
 
-  const inputSubmitHandler = async (e: FormEvent<HTMLFormElement>) => {
+  const branchSubmitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const newInput = `
-      「${projectName}」というプロジェクトの「${branch}」ブランチに「${filePath}」というファイルを作成してください。
-      「${commitMessage}」というコミットメッセージで作成してください。
-      また、ファイルの内容は以下です。
-        ${fileContent}
+    「${projectName}」というプロジェクトのブランチ一覧を見せてください。
     `
-    console.log(newInput)
-    console.log(commitMessage)
+    setInput(newInput)
+    onSubmitHandler(newInput)
+  }
+  const mrSubmitHandler = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const newInput = `
+    「${projectName}」というプロジェクトのマージリクエスト一覧を見せてください。
+    `
+    setInput(newInput)
+    onSubmitHandler(newInput)
+  }
+  const commitSubmitHandler = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const newInput = `
+    「${projectName}」というプロジェクトの「${branch}」ブランチのコミット一覧を見せてください。
+    `
     setInput(newInput)
     onSubmitHandler(newInput)
   }
@@ -109,6 +117,7 @@ export const CreateFile = () => {
       }
 
       const history_messages = [
+        { role: "system", content: "You are a Japanese helpful assistant." },
         { role: "user", content: input },
         response.choices[0].message,
         ...tool_response_messages,
@@ -155,15 +164,9 @@ export const CreateFile = () => {
               Home
             </button>
           </Link>
-          <Link to={"/updateFile"} className="mb-4 ml-2 inline-block">
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-              ファイル編集
-            </button>
-          </Link>
-          <p>ファイル新規作成</p>
         </div>
         <form
-          className="m-3 flex flex-row gap-1 "
+          className="m-3 flex flex-row gap-1"
           onSubmit={(e) => onSubmitToken(e)}
         >
           <input
@@ -179,77 +182,131 @@ export const CreateFile = () => {
             トークン保存
           </button>
         </form>
-        <form
-          onSubmit={(e) => inputSubmitHandler(e)}
-          className="m-3 flex flex-col gap-1 "
-        >
-          <div className="mb-4">
-            <label htmlFor="projectName" className="block text-gray-700">
-              プロジェクトの名前
-            </label>
-            <input
-              type="text"
-              id="projectName"
-              value={projectName}
-              onChange={(e) => setProjectName(e.target.value)}
-              className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
-            />
+        <div className="mb-4 flex">
+          <div className="w-1/2 flex-row mr-2">
+            <form
+              onSubmit={(e) => branchSubmitHandler(e)}
+              className="m-3 flex flex-col gap-1 "
+            >
+              <div className="mb-4">
+                <label htmlFor="page" className="block text-gray-700">
+                  ページ数:
+                </label>
+                <select
+                  id="page"
+                  value={page}
+                  onChange={(e) => setPage(parseInt(e.target.value))}
+                  className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
+                >
+                  {/* ページ数の選択肢を表示 */}
+                  {[1, 2, 3, 4, 5, 10, 25, 50, 100].map((page) => (
+                    <option key={page} value={page}>
+                      {page}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="mb-4">
+                <label htmlFor="perPage" className="block text-gray-700">
+                  1ページあたりの表示件数:
+                </label>
+                <select
+                  id="perPage"
+                  value={perPage}
+                  onChange={(e) => setPerPage(parseInt(e.target.value))}
+                  className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
+                >
+                  {/* 1ページあたりの表示件数の選択肢を表示 */}
+                  {[1, 3, 5, 10, 20, 50].map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="mb-4">
+                <label htmlFor="projectName" className="block text-gray-700">
+                  プロジェクトの名前
+                </label>
+                <input
+                  type="text"
+                  id="projectName"
+                  value={projectName}
+                  onChange={(e) => setProjectName(e.target.value)}
+                  className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
+                />
+              </div>
+              <button
+                type="submit"
+                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg p-2.5"
+              >
+                ブランチ一覧
+              </button>
+            </form>
           </div>
-          <div className="mb-4">
-            <label htmlFor="branch" className="block text-gray-700">
-              ブランチ名
-            </label>
-            <input
-              type="text"
-              id="branch"
-              value={branch}
-              onChange={(e) => setBranch(e.target.value)}
-              className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
-            />
+          <div className="w-1/2 flex-row mr-2">
+            <form
+              onSubmit={(e) => mrSubmitHandler(e)}
+              className="m-3 flex flex-col gap-1 "
+            >
+              <div className="mb-4">
+                <label htmlFor="projectName" className="block text-gray-700">
+                  プロジェクトの名前
+                </label>
+                <input
+                  type="text"
+                  id="projectName"
+                  value={projectName}
+                  onChange={(e) => setProjectName(e.target.value)}
+                  className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
+                />
+              </div>
+              <button
+                type="submit"
+                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg p-2.5"
+              >
+                MR一覧
+              </button>
+            </form>
           </div>
-          <div className="mb-4">
-            <label htmlFor="commitMessage" className="block text-gray-700">
-              コミットメッセージ
-            </label>
-            <input
-              type="text"
-              id="commitMessage"
-              value={commitMessage}
-              onChange={(e) => setCommitMessage(e.target.value)}
-              className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
-            />
+          <div className="w-1/2 flex-row mr-2">
+            <form
+              onSubmit={(e) => commitSubmitHandler(e)}
+              className="m-3 flex flex-col gap-1 "
+            >
+              <div className="mb-4">
+                <label htmlFor="projectName" className="block text-gray-700">
+                  プロジェクトの名前
+                </label>
+                <input
+                  type="text"
+                  id="projectName"
+                  value={projectName}
+                  onChange={(e) => setProjectName(e.target.value)}
+                  className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
+                />
+              </div>
+              <div className="mb-4">
+                <label htmlFor="projectName" className="block text-gray-700">
+                  ブランチの名前
+                </label>
+                <input
+                  type="text"
+                  id="projectName"
+                  value={branch}
+                  onChange={(e) => setProjectName(e.target.value)}
+                  className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
+                />
+              </div>
+              <button
+                type="submit"
+                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg p-2.5"
+              >
+                コミット一覧
+              </button>
+            </form>
           </div>
-          <div className="mb-4">
-            <label htmlFor="filePath" className="block text-gray-700">
-              ファイルパス
-            </label>
-            <input
-              type="text"
-              id="filePath"
-              value={filePath}
-              onChange={(e) => setFilePath(e.target.value)}
-              className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="fileContent" className="block text-gray-700">
-              ファイルの内容
-            </label>
-            <textarea
-              id="fileContent"
-              value={fileContent}
-              onChange={(e) => setFileContent(e.target.value)}
-              className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
-              rows={5}
-            ></textarea>
-          </div>
-          <button
-            type="submit"
-            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg p-2.5"
-          >
-            作成してpush
-          </button>
-        </form>
+        </div>
         <div className="m-3 mt-16 gap-1 flex flex-col">
           <p>-------------------GPT回答↓-------------------</p>
           {chatList.map((chat, index) => {

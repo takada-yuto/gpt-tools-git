@@ -14,7 +14,7 @@ export const Template = () => {
     "ファイル削除: 「poker」のリポジトリの「test」というブランチのindex.tsを削除してください。ファイルのパスはindex.tsです。コミットメッセージ名は「index.ts削除」です。",
   ]
   return (
-    <div className="container mx-auto mt-8">
+    <div className="container">
       <Link to="/" className="mb-4 inline-block">
         <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
           Home

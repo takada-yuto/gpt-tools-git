@@ -38,6 +38,8 @@ export const RevertCommit = () => {
   const [sha, setSha] = useState("")
   const [chatList, setChatList] = useState<ChatRequestMessage[] | []>([])
   const [token, setToken] = useRecoilState(tokenState)
+  const [page, setPage] = useState(1)
+  const [perPage, setPerPage] = useState(3)
 
   const inputSubmitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -104,7 +106,12 @@ export const RevertCommit = () => {
 
             if (available_functions.includes(function_name)) {
               const args: FunctionCall = tool_call.function
-              const function_response = await callFunction(token, args)
+              const function_response = await callFunction(
+                token,
+                args,
+                page,
+                perPage
+              )
               tool_response_messages.push({
                 tool_call_id: tool_call.id,
                 role: "tool",
@@ -246,7 +253,7 @@ export const RevertCommit = () => {
             type="submit"
             className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg p-2.5"
           >
-            リバートする
+            リバートしてpush
           </button>
         </form>
         <div className="m-3 mt-16 gap-1 flex flex-col">
