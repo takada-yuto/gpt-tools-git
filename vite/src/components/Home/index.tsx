@@ -1,17 +1,17 @@
-import { FormEvent, useState } from 'react'
+import { FormEvent, useState } from "react"
 import {
   OpenAIClient,
   AzureKeyCredential,
   ChatRequestMessage,
   FunctionCall,
   GetChatCompletionsOptions,
-} from '@azure/openai'
-import { callFunction } from '../../functions/call_function'
-import { TOOLS } from '../../lib/tools'
-import { OpenAIClientOptions } from '@azure/openai/types/src'
-import { tokenState } from '../../atoms/tokenState'
-import { useRecoilState } from 'recoil'
-import { Link } from 'react-router-dom'
+} from "@azure/openai"
+import { callFunction } from "../../functions/call_function"
+import { TOOLS } from "../../lib/tools"
+import { OpenAIClientOptions } from "@azure/openai/types/src"
+import { tokenState } from "../../atoms/tokenState"
+import { useRecoilState } from "recoil"
+import { Link } from "react-router-dom"
 
 const clientOptions: OpenAIClientOptions = { apiVersion: "2023-12-01-preview" }
 
@@ -20,15 +20,16 @@ const client = new OpenAIClient(
   new AzureKeyCredential(import.meta.env.VITE_AZURE_API_KEY),
   clientOptions
 )
-const deploymentId = 'gpt-4-turbo'
+// const deploymentId = 'gpt-4-turbo'
+const deploymentId = "gpt-35-turbo-1106"
 
-const options: GetChatCompletionsOptions = { 
-  tools: TOOLS
+const options: GetChatCompletionsOptions = {
+  tools: TOOLS,
 }
 
 export const Home = () => {
-  const [input, setInput] = useState('')
-  const [inputToken, setInputToken] = useState('')
+  const [input, setInput] = useState("")
+  const [inputToken, setInputToken] = useState("")
   const [chatList, setChatList] = useState<ChatRequestMessage[] | []>([])
   const [token, setToken] = useRecoilState(tokenState)
 
@@ -36,10 +37,10 @@ export const Home = () => {
     e.preventDefault()
     const newMessages: ChatRequestMessage[] = [
       ...chatList,
-      { role: 'user', content: input },
+      { role: "user", content: input },
     ]
     setChatList(newMessages)
-    setInput('')
+    setInput("")
     await callChat(newMessages)
   }
 
@@ -47,59 +48,58 @@ export const Home = () => {
     const events = await client.getChatCompletions(
       deploymentId,
       messages,
-      options,
+      options
     )
-    console.log("client")
-    console.log(client)
+
     handleResponse(events)
 
     async function handleResponse(response: any) {
-      const tool_response_messages: any[] = [];
+      const tool_response_messages: any[] = []
 
       if (response.choices[0].message.tool_calls !== null) {
-        const tool_calls = response.choices[0].message.toolCalls;
+        const tool_calls = response.choices[0].message.toolCalls
         console.log(response.choices[0].message)
 
         for (const tool_call of tool_calls) {
           if (tool_call.type === "function") {
-            const function_call = tool_call.function;
-            const function_name = function_call.name;
-            
-            const available_functions = TOOLS.map(tool => tool.function.name);
-            
+            const function_call = tool_call.function
+            const function_name = function_call.name
+
+            const available_functions = TOOLS.map((tool) => tool.function.name)
+
             if (available_functions.includes(function_name)) {
               const args: FunctionCall = tool_call.function
               const function_response = await callFunction(token, args)
               tool_response_messages.push({
-                "tool_call_id": tool_call.id,
-                "role": "tool",
-                "content": function_response,
-              });
+                tool_call_id: tool_call.id,
+                role: "tool",
+                content: function_response,
+              })
             } else {
-              console.error(`関数名：${function_name}`);
-              throw new Error("関数名が利用可能な関数と一致しません");
+              console.error(`関数名：${function_name}`)
+              throw new Error("関数名が利用可能な関数と一致しません")
             }
           }
         }
       } else {
-        console.log("関数は呼び出されませんでした");
+        console.log("関数は呼び出されませんでした")
       }
 
       const history_messages = [
-        {"role": "user", "content": input},
+        { role: "user", content: input },
         response.choices[0].message,
-        ...tool_response_messages
-      ];
+        ...tool_response_messages,
+      ]
       console.log(history_messages)
       const second_response = await client.getChatCompletions(
         deploymentId,
         history_messages,
         options
-      );
+      )
       console.log(second_response)
       const responseMessage = second_response.choices[0].message
       const message = {
-        role: 'function',
+        role: "function",
         content: JSON.stringify(responseMessage!.content),
       }
       const newMessages = [...messages, responseMessage as ChatRequestMessage]
@@ -118,53 +118,60 @@ export const Home = () => {
   }
 
   const onSubmitToken = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setToken(inputToken);
-    setInputToken('')
-  };
+    e.preventDefault()
+    setToken(inputToken)
+    setInputToken("")
+  }
 
   return (
     <>
       <div className="container mx-auto mt-8">
-      <Link to={"/template"} className="mb-4 inline-block">
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-          Template
-        </button>
-      </Link>
-      <Link to={"/test"} className="mb-4 ml-2 inline-block">
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-          Test
-        </button>
-      </Link>
+        <Link to={"/template"} className="mb-4 inline-block">
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Template
+          </button>
+        </Link>
+        <Link to={"/test"} className="mb-4 ml-2 inline-block">
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Test
+          </button>
+        </Link>
+        <Link to={"/fileAction"} className="mb-4 ml-2 inline-block">
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            ファイル新規作成・編集
+          </button>
+        </Link>
       </div>
-      <form 
-        className='m-3 flex flex-row gap-1 '
+      <form
+        className="m-3 flex flex-row gap-1 "
         onSubmit={(e) => onSubmitToken(e)}
       >
         <input
-          type='text'
+          type="text"
           value={inputToken}
-          className='grow bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-2.5'
+          className="grow bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-2.5"
           onChange={(e) => setInputToken(e.target.value)}
         />
-        <button 
-          type='submit'
-          className='text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg p-2.5'
-        >トークン保存</button>
+        <button
+          type="submit"
+          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg p-2.5"
+        >
+          トークン保存
+        </button>
       </form>
-      <div className='m-3 gap-1 flex flex-col'>
+      <div className="m-3 gap-1 flex flex-col">
         {chatList.map((chat, index) => {
-          let content = ''
-          let addClass = ''
+          let content = ""
+          let addClass = ""
           content = String(chat.content)
-          if (!chat.content) return ''
-          if (chat.role === 'function') return ''
-          if (chat.role === 'user') addClass += ' ml-auto mr-0'
+          if (!chat.content) return ""
+          if (chat.role === "function") return ""
+          if (chat.role === "user") addClass += " ml-auto mr-0"
           return (
             <p
               key={index}
               className={
-                'whitespace-pre-wrap break-all border border-gray-300 text-gray-900 rounded-lg p-2.5 w-fit' +
+                "whitespace-pre-wrap break-all border border-gray-300 text-gray-900 rounded-lg p-2.5 w-fit" +
                 addClass
               }
             >
@@ -175,17 +182,17 @@ export const Home = () => {
       </div>
       <form
         onSubmit={(e) => onSubmitHandler(e)}
-        className='m-3 flex flex-row gap-1 '
+        className="m-3 flex flex-row gap-1 "
       >
         <input
-          type='text'
+          type="text"
           value={input}
-          className='grow bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-2.5'
+          className="grow bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-2.5"
           onChange={(e) => setInput(e.target.value)}
         />
         <button
-          type='submit'
-          className='text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg p-2.5'
+          type="submit"
+          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg p-2.5"
         >
           送信
         </button>

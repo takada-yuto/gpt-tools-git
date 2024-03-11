@@ -21,24 +21,45 @@ const client = new OpenAIClient(
   new AzureKeyCredential(import.meta.env.VITE_AZURE_API_KEY),
   clientOptions
 )
-const deploymentId = "gpt-4-turbo"
+// const deploymentId = 'gpt-4-turbo'
+const deploymentId = "gpt-35-turbo-1106"
 
 const options: GetChatCompletionsOptions = {
-  tools: TOOLS,
+  tools: [TOOLS[10]], // ファイル編集関数指定
 }
 
-export const Test = () => {
+export const UpdateFileAction = () => {
   const [input, setInput] = useState("")
   const [inputToken, setInputToken] = useState("")
+  const [projectName, setProjectName] = useState("")
+  const [sourceContent, setSourceContent] = useState("")
+  const [targetContent, setTargetContent] = useState("")
+  const [filePath, setFilePath] = useState("")
+  const [branch, setBranch] = useState("")
+  const [commitMessage, setCommitMessage] = useState("")
   const [chatList, setChatList] = useState<ChatRequestMessage[] | []>([])
   const [token, setToken] = useRecoilState(tokenState)
 
-  const onSubmitHandler = async (e: FormEvent<HTMLFormElement>) => {
+  const inputSubmitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const newMessages: ChatRequestMessage[] = [
-      ...chatList,
-      { role: "user", content: input },
-    ]
+    const newInput = `
+      「${projectName}」というプロジェクトの「${branch}」ブランチの「${filePath}」というファイルを編集してください。
+      コミットメッセージは「${commitMessage}」としてください。
+      また、ファイルの内容は以下です。
+      ---編集前のファイルの内容---
+      ${sourceContent}
+      
+      ---編集後のファイルの内容---
+      ${targetContent}
+    `
+    console.log(newInput)
+    setInput(newInput)
+    onSubmitHandler(newInput)
+  }
+
+  const onSubmitHandler = async (input: string) => {
+    const newMessages: ChatRequestMessage[] = [{ role: "user", content: input }]
+    console.log(newMessages)
     setChatList(newMessages)
     setInput("")
     await callChat(newMessages)
@@ -132,6 +153,11 @@ export const Test = () => {
               Home
             </button>
           </Link>
+          <Link to={"/fileAction"} className="mb-4 ml-2 inline-block">
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+              ファイル新規作成
+            </button>
+          </Link>
         </div>
         <form
           className="m-3 flex flex-row gap-1 "
@@ -150,14 +176,104 @@ export const Test = () => {
             トークン保存
           </button>
         </form>
-        <div className="m-3 gap-1 flex flex-col">
+        <form
+          onSubmit={(e) => inputSubmitHandler(e)}
+          className="m-3 flex flex-col gap-1 "
+        >
+          <div className="mb-4">
+            <label htmlFor="projectName" className="block text-gray-700">
+              プロジェクトの名前
+            </label>
+            <input
+              type="text"
+              id="projectName"
+              value={projectName}
+              onChange={(e) => setProjectName(e.target.value)}
+              className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="branch" className="block text-gray-700">
+              ブランチ名
+            </label>
+            <input
+              type="text"
+              id="branch"
+              value={branch}
+              onChange={(e) => setBranch(e.target.value)}
+              className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="commitMessage" className="block text-gray-700">
+              コミットメッセージ
+            </label>
+            <input
+              type="text"
+              id="commitMessage"
+              value={commitMessage}
+              onChange={(e) => setCommitMessage(e.target.value)}
+              className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="filePath" className="block text-gray-700">
+              ファイルパス
+            </label>
+            <input
+              type="text"
+              id="filePath"
+              value={filePath}
+              onChange={(e) => setFilePath(e.target.value)}
+              className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
+            />
+          </div>
+          <label className="block text-gray-700">ファイルの内容</label>
+          <div className="mb-4 flex">
+            <div className="w-1/2 flex-row mr-2">
+              <label
+                htmlFor="beforeFileContent"
+                className="block text-gray-700"
+              >
+                編集前
+              </label>
+              <textarea
+                id="beforeFileContent"
+                value={sourceContent}
+                onChange={(e) => setSourceContent(e.target.value)}
+                className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
+                rows={5}
+              ></textarea>
+            </div>
+            <div className="w-1/2 flex-row">
+              <label htmlFor="afterFileContent" className="block text-gray-700">
+                編集後
+              </label>
+              <textarea
+                id="afterFileContent"
+                value={targetContent}
+                onChange={(e) => setTargetContent(e.target.value)}
+                className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
+                rows={5}
+              ></textarea>
+            </div>
+          </div>
+          <button
+            type="submit"
+            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg p-2.5"
+          >
+            作成
+          </button>
+        </form>
+        <div className="m-3 mt-16 gap-1 flex flex-col">
+          <p>-------------------GPT回答↓-------------------</p>
           {chatList.map((chat, index) => {
             let content = ""
             let addClass = ""
             content = String(chat.content)
             if (!chat.content) return ""
             if (chat.role === "function") return ""
-            if (chat.role === "user") addClass += " ml-auto mr-0"
+            if (chat.role === "user") return ""
             return (
               <ReactMarkdown
                 key={index}
@@ -175,23 +291,6 @@ export const Test = () => {
             )
           })}
         </div>
-        <form
-          onSubmit={(e) => onSubmitHandler(e)}
-          className="m-3 flex flex-row gap-1 "
-        >
-          <textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            className="grow bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-2.5"
-            rows={6} // 適切な行数を設定してください
-          />
-          <button
-            type="submit"
-            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg p-2.5"
-          >
-            送信
-          </button>
-        </form>
       </div>
     </>
   )
