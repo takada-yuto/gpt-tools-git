@@ -136,9 +136,14 @@ export const Home = () => {
             Test
           </button>
         </Link>
-        <Link to={"/fileAction"} className="mb-4 ml-2 inline-block">
+        <Link to={"/createFile"} className="mb-4 ml-2 inline-block">
           <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
             ファイル新規作成・編集
+          </button>
+        </Link>
+        <Link to={"/revertCommit"} className="mb-4 ml-2 inline-block">
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            リバート
           </button>
         </Link>
       </div>

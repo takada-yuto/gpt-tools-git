@@ -13,6 +13,7 @@ import { tokenState } from "../../atoms/tokenState"
 import { useRecoilState } from "recoil"
 import { Link } from "react-router-dom"
 import ReactMarkdown from "react-markdown"
+import { Confirm } from "../../util/toast"
 
 const clientOptions: OpenAIClientOptions = { apiVersion: "2023-12-01-preview" }
 
@@ -21,40 +22,54 @@ const client = new OpenAIClient(
   new AzureKeyCredential(import.meta.env.VITE_AZURE_API_KEY),
   clientOptions
 )
-// const deploymentId = 'gpt-4-turbo'
+// const deploymentId = 'gpt-4-turbo' // 4だとcallするときに日本語が文字化けするっぽい
 const deploymentId = "gpt-35-turbo-1106"
 
 const options: GetChatCompletionsOptions = {
-  tools: [TOOLS[10]], // ファイル編集関数指定
+  tools: [TOOLS[3]], // ファイル作成関数指定
 }
 
-export const UpdateFileAction = () => {
+export const RevertCommit = () => {
   const [input, setInput] = useState("")
   const [inputToken, setInputToken] = useState("")
   const [projectName, setProjectName] = useState("")
-  const [sourceContent, setSourceContent] = useState("")
-  const [targetContent, setTargetContent] = useState("")
-  const [filePath, setFilePath] = useState("")
   const [branch, setBranch] = useState("")
   const [commitMessage, setCommitMessage] = useState("")
+  const [sha, setSha] = useState("")
   const [chatList, setChatList] = useState<ChatRequestMessage[] | []>([])
   const [token, setToken] = useRecoilState(tokenState)
 
   const inputSubmitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const newInput = `
-      「${projectName}」というプロジェクトの「${branch}」ブランチの「${filePath}」というファイルを編集してください。
-      コミットメッセージは「${commitMessage}」としてください。
-      また、ファイルの内容は以下です。
-      ---編集前のファイルの内容---
-      ${sourceContent}
-      
-      ---編集後のファイルの内容---
-      ${targetContent}
-    `
-    console.log(newInput)
-    setInput(newInput)
-    onSubmitHandler(newInput)
+    try {
+      const action = await Confirm.fire({
+        title: "リバートします",
+      })
+      if (action.isConfirmed) {
+        const newInputCommitMessage = `
+        「${projectName}」というプロジェクトの「${branch}」ブランチで「${commitMessage}」というコミット名のコミットをリバートしてください。
+        `
+        const newInputSha = `
+          「${projectName}」というプロジェクトの「${branch}」ブランチで「${sha}」というshaのコミットをリバートしてください。
+          `
+        console.log(newInputCommitMessage)
+        console.log(newInputSha)
+        if (commitMessage && !sha) {
+          setInput(newInputCommitMessage)
+          onSubmitHandler(newInputCommitMessage)
+        }
+        if (!commitMessage && sha) {
+          setInput(newInputSha)
+          onSubmitHandler(newInputSha)
+        }
+        if (commitMessage && sha) {
+          setInput(newInputSha)
+          onSubmitHandler(newInputSha)
+        }
+      }
+    } catch (error: unknown) {
+      console.log(error)
+    }
   }
 
   const onSubmitHandler = async (input: string) => {
@@ -71,7 +86,6 @@ export const UpdateFileAction = () => {
       messages,
       options
     )
-
     handleResponse(events)
 
     async function handleResponse(response: any) {
@@ -107,6 +121,7 @@ export const UpdateFileAction = () => {
       }
 
       const history_messages = [
+        { role: "system", content: "You are a Japanese helpful assistant." },
         { role: "user", content: input },
         response.choices[0].message,
         ...tool_response_messages,
@@ -153,14 +168,9 @@ export const UpdateFileAction = () => {
               Home
             </button>
           </Link>
-          <Link to={"/fileAction"} className="mb-4 ml-2 inline-block">
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-              ファイル新規作成
-            </button>
-          </Link>
         </div>
         <form
-          className="m-3 flex flex-row gap-1 "
+          className="m-3 flex flex-row gap-1"
           onSubmit={(e) => onSubmitToken(e)}
         >
           <input
@@ -204,6 +214,10 @@ export const UpdateFileAction = () => {
               className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
             />
           </div>
+          <p className="m-4 text-red-500">
+            コミットメッセージもしくはSHAを入力してください。
+            コミット名が重複してそうな場合はSHAを入力してください
+          </p>
           <div className="mb-4">
             <label htmlFor="commitMessage" className="block text-gray-700">
               コミットメッセージ
@@ -218,51 +232,21 @@ export const UpdateFileAction = () => {
           </div>
           <div className="mb-4">
             <label htmlFor="filePath" className="block text-gray-700">
-              ファイルパス
+              SHA
             </label>
             <input
               type="text"
               id="filePath"
-              value={filePath}
-              onChange={(e) => setFilePath(e.target.value)}
+              value={sha}
+              onChange={(e) => setSha(e.target.value)}
               className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
             />
-          </div>
-          <label className="block text-gray-700">ファイルの内容</label>
-          <div className="mb-4 flex">
-            <div className="w-1/2 flex-row mr-2">
-              <label
-                htmlFor="beforeFileContent"
-                className="block text-gray-700"
-              >
-                編集前
-              </label>
-              <textarea
-                id="beforeFileContent"
-                value={sourceContent}
-                onChange={(e) => setSourceContent(e.target.value)}
-                className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
-                rows={5}
-              ></textarea>
-            </div>
-            <div className="w-1/2 flex-row">
-              <label htmlFor="afterFileContent" className="block text-gray-700">
-                編集後
-              </label>
-              <textarea
-                id="afterFileContent"
-                value={targetContent}
-                onChange={(e) => setTargetContent(e.target.value)}
-                className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
-                rows={5}
-              ></textarea>
-            </div>
           </div>
           <button
             type="submit"
             className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg p-2.5"
           >
-            作成
+            リバートする
           </button>
         </form>
         <div className="m-3 mt-16 gap-1 flex flex-col">

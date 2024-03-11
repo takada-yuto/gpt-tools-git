@@ -4,8 +4,9 @@ import { Home } from "./components/Home"
 import { RecoilRoot } from "recoil"
 import { Template } from "./components/Template"
 import { Test } from "./components/Test"
-import { FileAction } from "./components/FileAction"
-import { UpdateFileAction } from "./components/UpdateFileAction"
+import { CreateFile } from "./components/CreateFile"
+import { UpdateFile } from "./components/UpdateFile"
+import { RevertCommit } from "./components/RevertCommit"
 
 const router = createBrowserRouter([
   {
@@ -21,12 +22,16 @@ const router = createBrowserRouter([
     element: <Test />,
   },
   {
-    path: "/fileAction",
-    element: <FileAction />,
+    path: "/createFile",
+    element: <CreateFile />,
   },
   {
-    path: "/updateFileAction",
-    element: <UpdateFileAction />,
+    path: "/updateFile",
+    element: <UpdateFile />,
+  },
+  {
+    path: "/revertCommit",
+    element: <RevertCommit />,
   },
 ])
 

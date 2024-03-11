@@ -1,3 +1,4 @@
+import { Toast } from "../util/toast"
 import { searchProjectId } from "./project"
 
 const page = import.meta.env.VITE_DISPLAY_PAGE
@@ -30,6 +31,13 @@ export const searchCommitId = async (token: string, _args: any) => {
   const projectInfo = await response.json()
 
   if (projectInfo.length < 2) {
+    if (!projectInfo[0]) {
+      Toast.fire({
+        title: "指定されたコミットが見つかりませんでした",
+        icon: "warning",
+      })
+      throw new Error("エラー")
+    }
     return projectInfo[0]["id"]
   } else {
     return JSON.stringify({

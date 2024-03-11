@@ -6,6 +6,7 @@ import {
   FunctionCall,
 } from "@azure/openai"
 import { OpenAIClientOptions } from "@azure/openai/types/src"
+import { Toast } from "../util/toast"
 
 const clientOptions: OpenAIClientOptions = { apiVersion: "2023-12-01-preview" }
 
@@ -62,6 +63,13 @@ export const searchProjectId = async (token: string, _args: any) => {
   const projectInfo = await response.json()
   if (projectInfo.length < 2) {
     if (projectInfo[0]) {
+      if (!projectInfo[0]) {
+        Toast.fire({
+          title: "指定されたプロジェクトが見つかりませんでした",
+          icon: "warning",
+        })
+        throw new Error("エラー")
+      }
       return projectInfo[0].id
     } else {
     }

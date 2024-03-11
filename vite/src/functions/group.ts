@@ -1,3 +1,5 @@
+import { Toast } from "../util/toast"
+
 export const searchGroupId = async (token: string, _args: any) => {
   console.log("searchGroupIdが呼ばれました")
   const args = JSON.parse(_args)
@@ -11,6 +13,13 @@ export const searchGroupId = async (token: string, _args: any) => {
   console.log(response)
   console.log(groupInfo)
   if (groupInfo.length < 2) {
+    if (!groupInfo[0]) {
+      Toast.fire({
+        title: "指定されたgグループが見つかりませんでした",
+        icon: "warning",
+      })
+      throw new Error("エラー")
+    }
     return groupInfo[0].id
   } else {
     console.log(`複数の検索結果がありました。${groupInfo}`)

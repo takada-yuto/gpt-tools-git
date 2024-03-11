@@ -13,7 +13,6 @@ import { tokenState } from "../../atoms/tokenState"
 import { useRecoilState } from "recoil"
 import { Link } from "react-router-dom"
 import ReactMarkdown from "react-markdown"
-import { CreateFile } from "../CreateFile"
 
 const clientOptions: OpenAIClientOptions = { apiVersion: "2023-12-01-preview" }
 
@@ -22,18 +21,19 @@ const client = new OpenAIClient(
   new AzureKeyCredential(import.meta.env.VITE_AZURE_API_KEY),
   clientOptions
 )
-// const deploymentId = 'gpt-4-turbo' // 4だとcallするときに日本語が文字化けするっぽい
+// const deploymentId = 'gpt-4-turbo'
 const deploymentId = "gpt-35-turbo-1106"
 
 const options: GetChatCompletionsOptions = {
-  tools: [TOOLS[8]], // ファイル作成関数指定
+  tools: [TOOLS[10]], // ファイル編集関数指定
 }
 
-export const FileAction = () => {
+export const UpdateFile = () => {
   const [input, setInput] = useState("")
   const [inputToken, setInputToken] = useState("")
   const [projectName, setProjectName] = useState("")
-  const [fileContent, setFileContent] = useState("")
+  const [sourceContent, setSourceContent] = useState("")
+  const [targetContent, setTargetContent] = useState("")
   const [filePath, setFilePath] = useState("")
   const [branch, setBranch] = useState("")
   const [commitMessage, setCommitMessage] = useState("")
@@ -43,13 +43,16 @@ export const FileAction = () => {
   const inputSubmitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const newInput = `
-      「${projectName}」というプロジェクトの「${branch}」ブランチに「${filePath}」というファイルを作成してください。
-      「${commitMessage}」というコミットメッセージで作成してください。
+      「${projectName}」というプロジェクトの「${branch}」ブランチの「${filePath}」というファイルを編集してください。
+      コミットメッセージは「${commitMessage}」としてください。
       また、ファイルの内容は以下です。
-        ${fileContent}
+      ---編集前のファイルの内容---
+      ${sourceContent}
+      
+      ---編集後のファイルの内容---
+      ${targetContent}
     `
     console.log(newInput)
-    console.log(commitMessage)
     setInput(newInput)
     onSubmitHandler(newInput)
   }
@@ -68,6 +71,7 @@ export const FileAction = () => {
       messages,
       options
     )
+
     handleResponse(events)
 
     async function handleResponse(response: any) {
@@ -149,9 +153,9 @@ export const FileAction = () => {
               Home
             </button>
           </Link>
-          <Link to={"/updateFileAction"} className="mb-4 ml-2 inline-block">
+          <Link to={"/createFile"} className="mb-4 ml-2 inline-block">
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-              ファイル編集
+              ファイル新規作成
             </button>
           </Link>
         </div>
@@ -189,18 +193,6 @@ export const FileAction = () => {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="filePath" className="block text-gray-700">
-              ファイルパス
-            </label>
-            <input
-              type="text"
-              id="filePath"
-              value={filePath}
-              onChange={(e) => setFilePath(e.target.value)}
-              className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
-            />
-          </div>
-          <div className="mb-4">
             <label htmlFor="branch" className="block text-gray-700">
               ブランチ名
             </label>
@@ -225,16 +217,46 @@ export const FileAction = () => {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="fileContent" className="block text-gray-700">
-              ファイルの内容
+            <label htmlFor="filePath" className="block text-gray-700">
+              ファイルパス
             </label>
-            <textarea
-              id="fileContent"
-              value={fileContent}
-              onChange={(e) => setFileContent(e.target.value)}
+            <input
+              type="text"
+              id="filePath"
+              value={filePath}
+              onChange={(e) => setFilePath(e.target.value)}
               className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
-              rows={5}
-            ></textarea>
+            />
+          </div>
+          <label className="block text-gray-700">ファイルの内容</label>
+          <div className="mb-4 flex">
+            <div className="w-1/2 flex-row mr-2">
+              <label
+                htmlFor="beforeFileContent"
+                className="block text-gray-700"
+              >
+                編集前
+              </label>
+              <textarea
+                id="beforeFileContent"
+                value={sourceContent}
+                onChange={(e) => setSourceContent(e.target.value)}
+                className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
+                rows={5}
+              ></textarea>
+            </div>
+            <div className="w-1/2 flex-row">
+              <label htmlFor="afterFileContent" className="block text-gray-700">
+                編集後
+              </label>
+              <textarea
+                id="afterFileContent"
+                value={targetContent}
+                onChange={(e) => setTargetContent(e.target.value)}
+                className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
+                rows={5}
+              ></textarea>
+            </div>
           </div>
           <button
             type="submit"
