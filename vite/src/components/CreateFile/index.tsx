@@ -153,6 +153,7 @@ export const CreateFile = () => {
               ファイル編集
             </button>
           </Link>
+          <p>ファイル新規作成</p>
         </div>
         <form
           className="m-3 flex flex-row gap-1 "

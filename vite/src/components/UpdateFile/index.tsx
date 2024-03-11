@@ -158,6 +158,7 @@ export const UpdateFile = () => {
               ファイル新規作成
             </button>
           </Link>
+          <p>ファイル編集</p>
         </div>
         <form
           className="m-3 flex flex-row gap-1 "
