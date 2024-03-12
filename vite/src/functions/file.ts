@@ -16,18 +16,17 @@ export const createFile = async (
   console.log("createFileが呼ばれました")
   const projectId = await searchProjectId(token, _args, page, perPage)
   const args = JSON.parse(_args)
-  const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/files/${args.file_path}`
+  const file_path = args.file_path.replace("/", "%2F")
+  const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/files/${file_path}`
+  console.log(args.file_path)
+  console.log(url)
   const headers = {
     "PRIVATE-TOKEN": token,
     "Content-Type": "application/json",
   }
-  // const utf8Encoder = new TextEncoder();
-  // const encodedCommitMessage = utf8Encoder.encode(args.commit_message);
-  console.log(_args)
-  console.log(args.commit_message)
-  // console.log(encodedCommitMessage)
+  const branch = args.branch.replace("/", "%2F")
   const data = {
-    branch: args.branch,
+    branch: branch,
     content: args.content,
     commit_message: args.commit_message,
   }
@@ -49,13 +48,15 @@ export const deleteFile = async (
   console.log("deleteFileが呼ばれました")
   const projectId = await searchProjectId(token, _args, page, perPage)
   const args = JSON.parse(_args)
-  const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/files/${args.file_path}`
+  const file_path = args.file_path.replace("/", "%2F")
+  const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/files/${file_path}`
   const headers = {
     "PRIVATE-TOKEN": token,
     "Content-Type": "application/json",
   }
+  const branch = args.branch.replace("/", "%2F")
   const data = {
-    branch: args.branch,
+    branch: branch,
     commit_message: args.commit_message,
   }
   const response = await fetch(url, {
@@ -109,7 +110,9 @@ export const updateFile = async (
   }
   const projectId = await searchProjectId(token, _args, page, perPage)
   const args = JSON.parse(_args)
-  const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/files/${args.file_path}/raw?ref=${args.branch}`
+  const file_path = args.file_path.replace("/", "%2F")
+  const branch = args.branch.replace("/", "%2F")
+  const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/files/${file_path}/raw?ref=${branch}`
   const headers = {
     "PRIVATE-TOKEN": token,
     "Content-Type": "application/json",
@@ -142,9 +145,11 @@ export const updateFile = async (
   const file_content_args: any = tool_call?.function!.arguments
   const file_content_arg = JSON.parse(file_content_args)
   console.log(file_content_arg)
-  const second_url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/files/${args.file_path}`
+  const file_content_file_path = file_content_arg.file_path.replace("/", "%2F")
+  const second_url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/files/${file_content_file_path}`
+  const second_branch = args.branch.replace("/", "%2F")
   const second_data = {
-    branch: args.branch,
+    branch: second_branch,
     content: file_content_arg.content,
     commit_message: args.commit_message,
   }

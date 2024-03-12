@@ -10,7 +10,8 @@ export const listCommits = async (
   console.log("listCommitsが呼ばれました")
   const projectId = await searchProjectId(token, _args, page, perPage)
   const args = JSON.parse(_args)
-  const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/commits?private_token=${token}&page=${page}&per_page=${perPage}&ref_name=${args.branch}`
+  const branch = args.branch.replace("/", "%2F")
+  const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/commits?private_token=${token}&page=${page}&per_page=${perPage}&ref_name=${branch}`
   const headers = {
     "PRIVATE-TOKEN": token,
     "Content-Type": "application/json",
@@ -30,7 +31,8 @@ export const searchCommitId = async (
   const projectId = await searchProjectId(token, _args, page, perPage)
   const args = JSON.parse(_args)
   const encodedCommitName = encodeURIComponent(args.commit_name)
-  const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/search?scope=commits&search=${encodedCommitName}&ref=${args.branch}`
+  const branch = args.branch.replace("/", "%2F")
+  const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/search?scope=commits&search=${encodedCommitName}&ref=${branch}`
   const headers = {
     "PRIVATE-TOKEN": token,
     "Content-Type": "application/json",
@@ -75,8 +77,9 @@ export const revertCommit = async (
     "PRIVATE-TOKEN": token,
     "Content-Type": "application/json",
   }
+  const branch = args.branch.replace("/", "%2F")
   const data = {
-    branch: args.branch,
+    branch: branch,
   }
   const response = await fetch(url, {
     method: "POST",

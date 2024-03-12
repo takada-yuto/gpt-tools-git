@@ -65,7 +65,7 @@ export const CreateFile = () => {
   }
 
   const callChat = async (messages: ChatRequestMessage[]) => {
-    if (!inputToken) {
+    if (!token) {
       Toast.fire({
         title: "認証エラー：トークンを保存してください。",
         icon: "warning",

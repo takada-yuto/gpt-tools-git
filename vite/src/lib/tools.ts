@@ -224,7 +224,7 @@ export const TOOLS: ChatCompletionsFunctionToolDefinition[] = [
           file_path: {
             type: "string",
             description:
-              "作成するファイルのパス (例:app/index.html、app/hooks/useGetInfo、.env、package.json)",
+              "作成するファイルの絶対パス (例:app/index.html、app/hooks/useGetInfo.ts、.env、package.json)",
           },
           branch: {
             type: "string",
@@ -257,7 +257,7 @@ export const TOOLS: ChatCompletionsFunctionToolDefinition[] = [
           file_path: {
             type: "string",
             description:
-              "削除するファイルのパス (例:app/index.html、app/hooks/useGetInfo、.env、package.json)",
+              "削除するファイルのパス (例:app/index.html、app/hooks/useGetInfo.ts、.env、package.json)",
           },
           branch: {
             type: "string",
@@ -299,7 +299,7 @@ export const TOOLS: ChatCompletionsFunctionToolDefinition[] = [
           file_path: {
             type: "string",
             description:
-              "削除するファイルのパス (例:app/index.html、app/hooks/useGetInfo、.env、package.json)",
+              "削除するファイルのパス (例:app/index.html、app/hooks/useGetInfo.ts、.env、package.json)",
           },
           branch: {
             type: "string",

@@ -32,9 +32,11 @@ export const createBranches = async (
     "Content-Type": "application/json",
   }
   const args = JSON.parse(_args)
+  const new_branch = args.new_branch.replace("/", "%2F")
+  const source_bransh = args.source_bransh.replace("/", "%2F")
   const data = {
-    branch: args.new_branch,
-    ref: args.source_bransh,
+    branch: new_branch,
+    ref: source_bransh,
   }
   const response = await fetch(url, {
     method: "POST",
@@ -54,7 +56,8 @@ export const deleteBranches = async (
   console.log("delete_branchesが呼ばれました")
   const projectId = await searchProjectId(token, _args, page, perPage)
   const args = JSON.parse(_args)
-  const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/branches/${args.delete_branch}`
+  const delete_branch = args.delete_branch.replace("/", "%2F")
+  const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/branches/${delete_branch}`
   const headers = {
     "PRIVATE-TOKEN": token,
     "Content-Type": "application/json",
