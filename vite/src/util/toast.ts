@@ -6,7 +6,7 @@ export const Toast = Swal.mixin({
   showConfirmButton: false,
   showCloseButton: false,
   showCancelButton: false,
-  timer: 3000,
+  timer: 5000,
   timerProgressBar: false,
   icon: "success",
 })
@@ -16,7 +16,7 @@ export const Confirm = Swal.mixin({
   showCloseButton: true,
   showCancelButton: true,
   timerProgressBar: false,
-  heightAuto: false, // flexが崩れるため
+  heightAuto: false,
   confirmButtonColor: "#369",
   confirmButtonText: "おけまる",
   cancelButtonColor: "#E5E7EB",

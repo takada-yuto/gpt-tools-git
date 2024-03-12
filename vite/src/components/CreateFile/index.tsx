@@ -64,6 +64,13 @@ export const CreateFile = () => {
   }
 
   const callChat = async (messages: ChatRequestMessage[]) => {
+    if (!inputToken) {
+      Toast.fire({
+        title: "認証エラー：トークンを保存してください。",
+        icon: "warning",
+      })
+      throw new Error("トークンないよエラー")
+    }
     const events = await client.getChatCompletions(
       deploymentId,
       messages,

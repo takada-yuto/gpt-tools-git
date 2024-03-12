@@ -13,6 +13,7 @@ import { tokenState } from "../../atoms/tokenState"
 import { useRecoilState } from "recoil"
 import { Link } from "react-router-dom"
 import ReactMarkdown from "react-markdown"
+import { Toast } from "../../util/toast"
 
 const clientOptions: OpenAIClientOptions = { apiVersion: "2023-12-01-preview" }
 
@@ -68,6 +69,13 @@ export const UpdateFile = () => {
   }
 
   const callChat = async (messages: ChatRequestMessage[]) => {
+    if (!inputToken) {
+      Toast.fire({
+        title: "認証エラー：トークンを保存してください。",
+        icon: "warning",
+      })
+      throw new Error("トークンないよエラー")
+    }
     const events = await client.getChatCompletions(
       deploymentId,
       messages,

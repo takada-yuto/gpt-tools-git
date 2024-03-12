@@ -67,7 +67,7 @@ export const revertCommit = async (
   if (args.sha) {
     lastSha = args.sha
   } else {
-    const commitId = await searchCommitId(token, _args)
+    const commitId = await searchCommitId(token, _args, page, perPage)
     lastSha = commitId
   }
   const url = `https://gitlab-system-dev.k-idea.jp/api/v4/projects/${projectId}/repository/commits/${lastSha}/revert`

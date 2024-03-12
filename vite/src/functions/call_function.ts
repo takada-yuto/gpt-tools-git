@@ -5,6 +5,7 @@ import { listCommits, revertCommit } from "./commit"
 import { createBranches, deleteBranches, listBranches } from "./branch"
 import { searchGroupId } from "./group"
 import { createFile, deleteFile, updateFile } from "./file"
+import { Toast } from "../util/toast"
 
 const functionMap: {
   [key: string]: (
