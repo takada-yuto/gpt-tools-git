@@ -20,7 +20,7 @@ export const searchGroupId = async (
   if (groupInfo.length < 2) {
     if (!groupInfo[0]) {
       Toast.fire({
-        title: "指定されたgグループが見つかりませんでした",
+        title: "指定されたグループが見つかりませんでした",
         icon: "warning",
       })
       throw new Error("エラー")

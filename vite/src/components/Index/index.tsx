@@ -25,23 +25,29 @@ const client = new OpenAIClient(
 const deploymentId = "gpt-35-turbo-1106"
 
 const options: GetChatCompletionsOptions = {
-  tools: [TOOLS[3]], // ファイル作成関数指定
+  tools: [TOOLS[0], TOOLS[2], TOOLS[4]], // 一覧関数指定
 }
 
 export const Index = () => {
   const [input, setInput] = useState("")
   const [inputToken, setInputToken] = useState("")
-  const [projectName, setProjectName] = useState("")
+  const [branchProjectName, setBranchProjectName] = useState("")
+  const [mrProjectName, setMrProjectName] = useState("")
+  const [commitProjectName, setCommitProjectName] = useState("")
   const [branch, setBranch] = useState("")
   const [chatList, setChatList] = useState<ChatRequestMessage[] | []>([])
   const [token, setToken] = useRecoilState(tokenState)
-  const [page, setPage] = useState(1)
-  const [perPage, setPerPage] = useState(3)
+  const [branchPage, setBranchPage] = useState(1)
+  const [branchPerPage, setBranchPerPage] = useState(3)
+  const [mrPage, setMrPage] = useState(1)
+  const [mrPerPage, setMrPerPage] = useState(3)
+  const [commitPage, setCommitPage] = useState(1)
+  const [commitPerPage, setCommitPerPage] = useState(3)
 
   const branchSubmitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const newInput = `
-    「${projectName}」というプロジェクトのブランチ一覧を見せてください。
+    「${branchProjectName}」というプロジェクトのブランチ一覧を見せてください。
     `
     setInput(newInput)
     onSubmitHandler(newInput)
@@ -49,7 +55,7 @@ export const Index = () => {
   const mrSubmitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const newInput = `
-    「${projectName}」というプロジェクトのマージリクエスト一覧を見せてください。
+    「${mrProjectName}」というプロジェクトのマージリクエスト一覧を見せてください。
     `
     setInput(newInput)
     onSubmitHandler(newInput)
@@ -57,7 +63,7 @@ export const Index = () => {
   const commitSubmitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const newInput = `
-    「${projectName}」というプロジェクトの「${branch}」ブランチのコミット一覧を見せてください。
+    「${commitProjectName}」というプロジェクトの「${branch}」ブランチのコミット一覧を見せてください。
     `
     setInput(newInput)
     onSubmitHandler(newInput)
@@ -94,7 +100,26 @@ export const Index = () => {
             const available_functions = TOOLS.map((tool) => tool.function.name)
 
             if (available_functions.includes(function_name)) {
+              let page = 0
+              let perPage = 0
               const args: FunctionCall = tool_call.function
+              switch (function_name) {
+                case "listBranches":
+                  page = branchPage
+                  perPage = branchPerPage
+                  break
+                case "getMergeRequests":
+                  page = mrPage
+                  perPage = mrPerPage
+                  break
+                case "listCommits":
+                  page = commitPage
+                  perPage = commitPerPage
+                  break
+                default:
+                  console.error(`関数名：${function_name}`)
+                  throw new Error("関数名が利用可能な関数と一致しません")
+              }
               const function_response = await callFunction(
                 token,
                 args,
@@ -117,7 +142,7 @@ export const Index = () => {
       }
 
       const history_messages = [
-        { role: "system", content: "You are a Japanese helpful assistant." },
+        { role: "system", content: "日本語で回答します。" },
         { role: "user", content: input },
         response.choices[0].message,
         ...tool_response_messages,
@@ -194,8 +219,8 @@ export const Index = () => {
                 </label>
                 <select
                   id="page"
-                  value={page}
-                  onChange={(e) => setPage(parseInt(e.target.value))}
+                  value={branchPage}
+                  onChange={(e) => setBranchPage(parseInt(e.target.value))}
                   className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
                 >
                   {/* ページ数の選択肢を表示 */}
@@ -212,8 +237,8 @@ export const Index = () => {
                 </label>
                 <select
                   id="perPage"
-                  value={perPage}
-                  onChange={(e) => setPerPage(parseInt(e.target.value))}
+                  value={branchPerPage}
+                  onChange={(e) => setBranchPerPage(parseInt(e.target.value))}
                   className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
                 >
                   {/* 1ページあたりの表示件数の選択肢を表示 */}
@@ -231,8 +256,8 @@ export const Index = () => {
                 <input
                   type="text"
                   id="projectName"
-                  value={projectName}
-                  onChange={(e) => setProjectName(e.target.value)}
+                  value={branchProjectName}
+                  onChange={(e) => setBranchProjectName(e.target.value)}
                   className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
                 />
               </div>
@@ -250,14 +275,50 @@ export const Index = () => {
               className="m-3 flex flex-col gap-1 "
             >
               <div className="mb-4">
+                <label htmlFor="page" className="block text-gray-700">
+                  ページ数:
+                </label>
+                <select
+                  id="page"
+                  value={mrPage}
+                  onChange={(e) => setMrPage(parseInt(e.target.value))}
+                  className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
+                >
+                  {/* ページ数の選択肢を表示 */}
+                  {[1, 2, 3, 4, 5, 10, 25, 50, 100].map((page) => (
+                    <option key={page} value={page}>
+                      {page}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="mb-4">
+                <label htmlFor="perPage" className="block text-gray-700">
+                  1ページあたりの表示件数:
+                </label>
+                <select
+                  id="perPage"
+                  value={mrPerPage}
+                  onChange={(e) => setMrPerPage(parseInt(e.target.value))}
+                  className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
+                >
+                  {/* 1ページあたりの表示件数の選択肢を表示 */}
+                  {[1, 3, 5, 10, 20, 50].map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="mb-4">
                 <label htmlFor="projectName" className="block text-gray-700">
                   プロジェクトの名前
                 </label>
                 <input
                   type="text"
                   id="projectName"
-                  value={projectName}
-                  onChange={(e) => setProjectName(e.target.value)}
+                  value={mrProjectName}
+                  onChange={(e) => setMrProjectName(e.target.value)}
                   className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
                 />
               </div>
@@ -275,14 +336,50 @@ export const Index = () => {
               className="m-3 flex flex-col gap-1 "
             >
               <div className="mb-4">
+                <label htmlFor="page" className="block text-gray-700">
+                  ページ数:
+                </label>
+                <select
+                  id="page"
+                  value={commitPage}
+                  onChange={(e) => setCommitPage(parseInt(e.target.value))}
+                  className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
+                >
+                  {/* ページ数の選択肢を表示 */}
+                  {[1, 2, 3, 4, 5, 10, 25, 50, 100].map((page) => (
+                    <option key={page} value={page}>
+                      {page}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="mb-4">
+                <label htmlFor="perPage" className="block text-gray-700">
+                  1ページあたりの表示件数:
+                </label>
+                <select
+                  id="perPage"
+                  value={commitPerPage}
+                  onChange={(e) => setCommitPerPage(parseInt(e.target.value))}
+                  className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
+                >
+                  {/* 1ページあたりの表示件数の選択肢を表示 */}
+                  {[1, 3, 5, 10, 20, 50].map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="mb-4">
                 <label htmlFor="projectName" className="block text-gray-700">
                   プロジェクトの名前
                 </label>
                 <input
                   type="text"
                   id="projectName"
-                  value={projectName}
-                  onChange={(e) => setProjectName(e.target.value)}
+                  value={commitProjectName}
+                  onChange={(e) => setCommitProjectName(e.target.value)}
                   className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
                 />
               </div>
@@ -294,7 +391,7 @@ export const Index = () => {
                   type="text"
                   id="projectName"
                   value={branch}
-                  onChange={(e) => setProjectName(e.target.value)}
+                  onChange={(e) => setBranch(e.target.value)}
                   className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
                 />
               </div>
@@ -320,7 +417,7 @@ export const Index = () => {
               <ReactMarkdown
                 key={index}
                 className={
-                  "whitespace-pre-wrap break-all border bg-gray-50 border-gray-300 text-gray-900 rounded-lg p-2.5 w-fit" +
+                  "whitespace-pre-wrap break-all border bg-gray-50 border-gray-300 text-gray-900 rounded-lg p-2.5" +
                   addClass
                 }
                 components={{
